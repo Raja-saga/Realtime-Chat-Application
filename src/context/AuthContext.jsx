@@ -46,9 +46,11 @@ const login = async (state,credentials)=>{
             toast.success(data.message)
         }else{
             toast.error(data.message);
+            logout();
         }
     }catch(error){
         toast.error(error.message);
+        logout();
     }
 }
 
