@@ -11,9 +11,10 @@ axios.defaults.baseURL = backendUrl;
 export const AuthContext = createContext();
 
 export const AuthProvider = ({children})=>{
-
+    
+     const [currentUser, setCurrentUser] = useState(null);
     const[token,setToken] = useState(localStorage.getItem("token"))
-    const[authUser,setAuthUser] = useState(null)
+    const[authUser,setAuthUser] = useState(JSON.parse(localStorage.getItem("chat-user")) || null)
     const[onlineUsers,setOnlineUsers] = useState([]);
     const[socket,setSocket] = useState(null);
 
@@ -35,14 +36,16 @@ export const AuthProvider = ({children})=>{
 //Login function to handle user authentication and socket token
 
 const login = async (state,credentials)=>{
+   
     try{
         const {data} = await axios.post(`/api/auth/${state}`,credentials);
         if(data.success){
             setAuthUser(data.userData);
-            connectSocket(data.userData);
-            axios.defaults.headers.common["token"] = data.token;
+            localStorage.setItem("chat-user", JSON.stringify(data.userData)); // ✅
+            axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
             setToken(data.token);
             localStorage.setItem("token",data.token)
+            connectSocket(data.userData);
             toast.success(data.message)
         }else{
             toast.error(data.message);
@@ -57,12 +60,15 @@ const login = async (state,credentials)=>{
 //Logout function to handle user logout and disconnect the socket disconnection
 const logout = async()=>{
     localStorage.removeItem("token");
+    localStorage.removeItem("chat-user");
     setToken(null);
     setAuthUser(null);
     setOnlineUsers([]);
+    delete axios.defaults.headers.common["Authorization"];
+    if(socket)socket.disconnect();
     axios.defaults.headers.common["token"]=null;
     toast.success("Logged out successfully");
-    socket.disconnect();
+    
 }
 
     // Update profile function to handle user profile updates 
@@ -71,6 +77,7 @@ const logout = async()=>{
             const {data} = await axios.put("/api/auth/update-profile",body);
             if(data.success){
                 setAuthUser(data.user);
+                localStorage.setItem("chat-user", JSON.stringify(data.user));
                 toast.success("Profile updated successfully");
             }
         }catch(error){
@@ -97,8 +104,11 @@ const logout = async()=>{
 
 
     useEffect(()=>{
+    const user = JSON.parse(localStorage.getItem("chat-user")); // adjust key
+    setCurrentUser(user);
+
         if(token){
-            axios.defaults.headers.common["token"]=token;
+            axios.defaults.headers.common["Authorization"]=`Bearer ${token}`;
             checkAuth();
         }
     },[])

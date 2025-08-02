@@ -1,7 +1,7 @@
 import React,{useRef,useEffect, useContext,useState} from 'react'
 import assets, { messagesDummyData } from '../assets/assets'
 import { formatMessageTime } from '../lib/utils'
-import { ChatContext } from '../context/ChatContent'
+import { ChatContext } from '../context/ChatContext'
 import { AuthContext } from '../context/AuthContext'
 
 
@@ -40,6 +40,7 @@ const ChatContainer = () => {
     reader.readAsDataURL(file)
 
   }
+
 
   useEffect(()=>{
     if(selectedUser){

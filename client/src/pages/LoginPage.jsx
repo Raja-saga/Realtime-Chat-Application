@@ -16,6 +16,7 @@ const LoginPage = () => {
     event.preventDefault();
 
     if (currState === "Sign up" && !isDataSubmitted) {
+      if (!fullName || !email || !password) return;
       setIsDataSubmitted(true);
       return;
     }

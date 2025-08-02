@@ -28,48 +28,57 @@ const ProfilePage = () => {
     }
   }
 
-  // useEffect(() => {
-  //   if (authUser) {
-  //     setName(authUser.fullName || '');
-  //     setBio(authUser.bio || '');
-  //   }
-  // }, [authUser]);
+//   const handleSubmit = async (e) => {
+//   e.preventDefault();
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
+//   let profilePicUrl = authUser?.profilePic;
 
-  //   let profilePicUrl = authUser?.profilePic;
+//   // ✅ If a new image was selected, upload to Cloudinary
+//   if (selectedImg) {
+//     profilePicUrl = await handleImageUpload(selectedImg);
+//   }
 
-  //   if (selectedImg) {
-  //     const formData = new FormData();
-  //     formData.append('file', selectedImg);
-  //     formData.append('upload_preset', 'YOUR_UPLOAD_PRESET'); // 👈 Replace with your Cloudinary preset
+//   // ✅ Save updated profile info
+//   await updateProfile({
+//     fullName: name,
+//     bio,
+//     profilePic: profilePicUrl,
+    
+//   });
+//   navigate('/');
+// };
 
-  //     try {
-  //       const res = await fetch(
-  //         'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload', // 👈 Replace with your Cloudinary cloud name
-  //         {
-  //           method: 'POST',
-  //           body: formData,
-  //         }
-  //       );
 
-  //       const data = await res.json();
-  //       profilePicUrl = data.secure_url;
-  //     } catch (error) {
-  //       console.error('Cloudinary upload failed:', error);
-  //       return;
-  //     }
-  //   }
+const handleImageUpload = async (file) => {
+  const data = new FormData();
+  data.append("file", file);
+  data.append("upload_preset", "my_unsigned_preset"); // ✅ Replace with your actual unsigned preset
+  data.append("cloud_name", "dntzo72hj"); // ✅ Replace with your actual Cloud name
 
-  //   await updateProfile({
-  //     fullName: name,
-  //     bio,
-  //     profilePic: profilePicUrl,
-  //   });
+  try {
+    const res = await fetch("https://api.cloudinary.com/v1_1/dntzo72hj/image/upload", {
+      method: "POST",
+      body: data,
+    });
 
-  //   navigate('/');
-  // };
+    const result = await res.json();
+    console.log("Uploaded URL:", result.secure_url);
+    return result.secure_url;
+  } catch (err) {
+    console.error("Upload error:", err);
+  }
+};
+
+
+
+  useEffect(() => {
+    if (authUser) {
+      setName(authUser.fullName || '');
+      setBio(authUser.bio || '');
+    }
+  }, [authUser]);
+
+
 
   return (
     <div className="min-h-screen bg-cover bg-no-repeat flex items-center justify-center">
@@ -90,7 +99,7 @@ const ProfilePage = () => {
               accept=".png, .jpg, .jpeg"
               hidden
             />
-            <img
+            <img 
               src={
                 selectedImg
                   ? URL.createObjectURL(selectedImg)
@@ -126,9 +135,12 @@ const ProfilePage = () => {
         </form>
 
         <img
-          className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 object-cover 
+          className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10  
             ${selectedImg && 'rounded-full'}`}
-          src={authUser?.profilePic || assets.logo_icon}
+          src={
+             selectedImg
+             ? URL.createObjectURL(selectedImg)
+            :authUser?.profilePic || assets.logo_icon}
           alt=""
         />
       </div>

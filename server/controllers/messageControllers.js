@@ -12,11 +12,11 @@ export const getUsersForSidebar = async (req,res) =>{
         const filteredUsers = await User.find({_id: {$ne: userId}}).select("-password");
 
         //Count number of messages not seen
-        const unseedMessages={}
-        const promises = filteredUsers.map(async ()=>{
-            const messages = await Message.find({senderId: user._id,receiverId: userId, seen: false})
+        const unseenMessages={}
+        const promises = filteredUsers.map(async (user)=>{
+            const messages = await Message.find({senderId: user._id,receiverId: userId, seen: false,});
             if(messages.length > 0){
-                unseedMessages[user._id] = messages.length;
+                unseenMessages[user._id] = messages.length;
             }
         })
         await Promise.all(promises);
@@ -55,7 +55,7 @@ export const getMessages = async (req, res) => {
 export const markMessageAsSeen = async (req,res)=>{
     try{
         const{id} = req.params;
-        await Message.findIdAndUpdate(id,{seen:true})
+        await Message.findByIdAndUpdate(id,{seen:true})
         res.json({success:true})
     }catch(error){
         console.log(error.message);
@@ -72,7 +72,7 @@ export const sendMessage = async(req,res)=>{
 
         let imageUrl;
         if(image){
-            const uploadResponse = await cloudinary.uploader(image)
+            const uploadResponse = await cloudinary.uploader.upload(image)
             imageUrl = uploadResponse.secure_url;
         }
         const newMessage = await Message.create({

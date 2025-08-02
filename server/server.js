@@ -40,8 +40,10 @@ io.on("connection",(socket)=>{
 
 
 //middlewares setup
-app.use(express.json({limit: '4mb'}));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cors());
+
 
 
 //routes setup

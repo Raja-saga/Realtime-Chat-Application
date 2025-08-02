@@ -2,15 +2,16 @@ import React , { useContext,useState,useEffect } from 'react'
 import assets from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import {AuthContext} from '../context/AuthContext'
-import { ChatContext } from '../context/ChatContent'
+import { ChatContext } from '../context/ChatContext'
 
+console.log("Sidebar loaded");  // or Home.jsx, ChatBox.jsx, etc.
 
 const Sidebar = () => {
 
   const {getUsers, users, selectedUser, setSelectedUser,
-  unseenMessages,setUnseenMessages,onlineUsers} = useContext(ChatContext)
+  unseenMessages ,setUnseenMessages} = useContext(ChatContext)
 
-  const {logout} = useContext(AuthContext);
+  const {logout,onlineUsers,currentUser} = useContext(AuthContext);
 
   const [input,setInput] = useState(false)
 
@@ -19,9 +20,22 @@ const Sidebar = () => {
   const filteredUsers = input ? users.filter((user)=>user.fullName.toLowerCase().
   includes(input.toLowerCase())) : users;
 
+  
+console.log("👤 currentUser in Sidebar:", currentUser);
+
+
+   console.log("🔍 Input:", input);
+   console.log("🔍 Filtered Users:", filteredUsers);
+
+   console.log("👤 Current user:", currentUser);
+
+
   useEffect(()=>{
     getUsers();
-  },[onlineUsers])
+   console.log("📦 All users from context:", users);
+  },[])
+
+
 
   return (
     <div className={`bg-[#8185B2]/10 h-full p-5 rounded-r-xl overflow-y-scroll text-white ${selectedUser ? "max-md:hidden" : ''}`}>
@@ -56,8 +70,8 @@ const Sidebar = () => {
                 <span className='text-neutral-400 text-xs'>Offline</span>
               }
             </div>
-            {unseenMessages[user._id]>0 && <p className='absolute top-4 right-4 
-            text-xs h-5 w-5 flex justify-center items-center items-center rounded-full 
+            {unseenMessages?.[user._id]>0 && <p className='absolute top-4 right-4 
+            text-xs h-5 w-5 flex justify-center items-center rounded-full 
             bg-violet-500/50'>{unseenMessages[user._id]}</p>
             }
             </div>
