@@ -3,6 +3,7 @@ import assets from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import {AuthContext} from '../context/AuthContext'
 import { ChatContext } from '../context/ChatContext'
+import axios from 'axios'
 
 console.log("Sidebar loaded");  // or Home.jsx, ChatBox.jsx, etc.
 
@@ -13,10 +14,22 @@ const Sidebar = () => {
 
   const {logout,onlineUsers,currentUser} = useContext(AuthContext);
 
+  const [imgUrl, setImgUrl ] = useState([]);
+
   const [input,setInput] = useState(false)
+  const userid = localStorage.getItem("userId");
 
   const navigate = useNavigate();
 
+  const getuserProfile = async()=>{
+    const res = await axios.get("http://localhost:5000/api/auth/get-profile");
+    console.log("hi ",res.data);
+    // setImgUrl(res.data.data.profilePicture);
+    setImgUrl(res.data.data)
+  }
+useEffect(()=>{
+  getuserProfile();
+},[])
   const filteredUsers = input ? users.filter((user)=>user.fullName.toLowerCase().
   includes(input.toLowerCase())) : users;
 
@@ -34,8 +47,6 @@ console.log("👤 currentUser in Sidebar:", currentUser);
     getUsers();
    console.log("📦 All users from context:", users);
   },[])
-
-
 
   return (
     <div className={`bg-[#8185B2]/10 h-full p-5 rounded-r-xl overflow-y-scroll text-white ${selectedUser ? "max-md:hidden" : ''}`}>
@@ -57,11 +68,11 @@ console.log("👤 currentUser in Sidebar:", currentUser);
         </div>
       </div>
       <div className='flex flex-col'>
-        {filteredUsers.map((user,index)=>(
+        {imgUrl.map((user,index)=>(
           <div onClick={()=> {setSelectedUser(user); setUnseenMessages(prev=>
             ({...prev,[user._id]:0 }))}} 
           key={index} className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm ${selectedUser?._id === user._id && 'bg-[#282142]/50]'}`}>
-            <img src={user?.profilePic||assets.avator_icon}alt="" className='w-[35px] aspect-[1/1] rounded-full'/>
+            <img src={user.profilePicture}alt="" className='w-[35px] aspect-[1/1] rounded-full'/>
             <div>
               <p>{user.fullName}</p>
               {
@@ -76,6 +87,8 @@ console.log("👤 currentUser in Sidebar:", currentUser);
             }
             </div>
         ))}
+
+       
       </div>
     </div>
   )

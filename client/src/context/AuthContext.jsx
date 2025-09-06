@@ -12,7 +12,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({children})=>{
     
-     const [currentUser, setCurrentUser] = useState(null);
+    // const [currentUser, setCurrentUser] = useState(null);
     const[token,setToken] = useState(localStorage.getItem("token"))
     const[authUser,setAuthUser] = useState(JSON.parse(localStorage.getItem("chat-user")) || null)
     const[onlineUsers,setOnlineUsers] = useState([]);
@@ -25,7 +25,8 @@ export const AuthProvider = ({children})=>{
         try{
             const{data} = await axios.get("/api/auth/check");
             if(data.success){
-                setAuthUser (data.user)
+                setAuthUser(data.user);
+                localStorage.setItem("chat-user", JSON.stringify(data.user));
                 connectSocket(data.user);
             }
         }catch(error){
@@ -47,6 +48,8 @@ const login = async (state,credentials)=>{
             localStorage.setItem("token",data.token)
             connectSocket(data.userData);
             toast.success(data.message)
+            console.log(data)
+            localStorage.setItem("userId", data?.userData?._id)
         }else{
             toast.error(data.message);
             logout();
@@ -76,8 +79,14 @@ const logout = async()=>{
         try{
             const {data} = await axios.put("/api/auth/update-profile",body);
             if(data.success){
-                setAuthUser(data.user);
-                localStorage.setItem("chat-user", JSON.stringify(data.user));
+                const updatedUser = {
+          ...data.user,
+          profilePic: data.user.profilePic
+            ? `${data.user.profilePic}?v=${Date.now()}`
+            : null,};
+
+                setAuthUser(updatedUser);
+                localStorage.setItem("chat-user", JSON.stringify(updatedUser));
                 toast.success("Profile updated successfully");
             }
         }catch(error){
@@ -104,14 +113,14 @@ const logout = async()=>{
 
 
     useEffect(()=>{
-    const user = JSON.parse(localStorage.getItem("chat-user")); // adjust key
-    setCurrentUser(user);
+    // const user = JSON.parse(localStorage.getItem("chat-user")); // adjust key
+    // setCurrentUser(user);
 
         if(token){
             axios.defaults.headers.common["Authorization"]=`Bearer ${token}`;
             checkAuth();
         }
-    },[])
+    },[token])
 
 
     const value = {

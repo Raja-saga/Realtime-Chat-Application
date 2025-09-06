@@ -11,7 +11,7 @@ export const signup = async (req,res)=>{
          if(!fullName || !email || !bio || !password) {
             return res.json({success: false, message: "Missing Details "})
          }
-         const userExists = await User.findOne({ email});
+         const userExists = await User.findOne({email});
 
             if(userExists) {
                 return res.json({success: false, message: "Account already exists"});
@@ -74,9 +74,10 @@ export const updateProfile = async (req, res) => {
         );
     }else{
         const upload = await cloudinary.uploader.upload(profilePic)
-
-        updatedUser = await User.findByIdAndUpdate(userId,{profilePicture:upload.secure_url, bio, fullName},
+        
+        updatedUser = await User.findByIdAndUpdate(userId,{profilePic:upload.secure_url, bio, fullName},
             { new: true });
+            console.log("profile pic updated");
     } 
     res.json({ success: true, user: updatedUser});
     }
@@ -84,5 +85,15 @@ export const updateProfile = async (req, res) => {
     catch (error) {
         console.error(error.message);
         res.json({ success: false, message: error.message });
+    }
+}
+
+export const getProfile = async(req,res) =>{
+    try {
+        const user = await User.find();
+        res.json({message:"User Successfully fetched ", data : user})
+    }catch(error){
+        res.json({message:"Error", error})
+        console.log(error);
     }
 }

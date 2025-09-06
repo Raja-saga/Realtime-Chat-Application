@@ -11,42 +11,42 @@ const ProfilePage = () => {
   const [name, setName] = useState(authUser.fullName);
   const [bio, setBio] = useState(authUser.bio);
 
-  const handleSubmit = async (e) =>{
-    e.preventDefault();
-    if(!selectedImg){
-      await updateProfile({fullName: name,bio})
-      navigate('/')
-      return;
-    }
+  // const handleSubmit = async (e) =>{
+  //   e.preventDefault();
+  //   if(!selectedImg){
+  //     await updateProfile({fullName: name,bio})
+  //     navigate('/')
+  //     return;
+  //   }
 
-    const reader = new FileReader();
-    reader.readAsDataURL(selectedImg);
-    reader.onload = async ()=>{
-      const base64Image = reader.result;
-      await updateProfile({profilePic:base64Image,fullName:name,bio})
-      navigate('/');
-    }
+  //   const reader = new FileReader();
+  //   reader.readAsDataURL(selectedImg);
+  //   reader.onload = async ()=>{
+  //     const base64Image = reader.result;
+  //     await updateProfile({profilePic:base64Image,fullName:name,bio})
+  //     navigate('/');
+  //   }
+  // }
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  let profilePicUrl = authUser?.profilePic;
+
+  // ✅ If a new image was selected, upload to Cloudinary
+  if (selectedImg) {
+    profilePicUrl = await handleImageUpload(selectedImg);
   }
 
-//   const handleSubmit = async (e) => {
-//   e.preventDefault();
-
-//   let profilePicUrl = authUser?.profilePic;
-
-//   // ✅ If a new image was selected, upload to Cloudinary
-//   if (selectedImg) {
-//     profilePicUrl = await handleImageUpload(selectedImg);
-//   }
-
-//   // ✅ Save updated profile info
-//   await updateProfile({
-//     fullName: name,
-//     bio,
-//     profilePic: profilePicUrl,
+  // ✅ Save updated profile info
+  await updateProfile({
+    fullName: name,
+    bio,
+    profilePic: profilePicUrl,
     
-//   });
-//   navigate('/');
-// };
+  });
+  navigate('/');
+};
 
 
 const handleImageUpload = async (file) => {
@@ -106,7 +106,7 @@ const handleImageUpload = async (file) => {
                   : authUser?.profilePic || assets.avatar_icon
               }
               alt=""
-              className="w-12 h-12 rounded-full object-cover"
+              className={`w-12 h-12 ${selectedImg && 'rounded-full'}`}
             />
             Upload Profile Image
           </label>
