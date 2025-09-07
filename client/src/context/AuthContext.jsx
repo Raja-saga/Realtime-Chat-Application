@@ -78,17 +78,21 @@ const logout = async()=>{
     const updateProfile = async (body)=>{
         try{
             const {data} = await axios.put("/api/auth/update-profile",body);
-            if(data.success){
-                const updatedUser = {
-          ...data.user,
-          profilePic: data.user.profilePic
-            ? `${data.user.profilePic}?v=${Date.now()}`
-            : null,};
 
-                setAuthUser(updatedUser);
-                localStorage.setItem("chat-user", JSON.stringify(updatedUser));
-                toast.success("Profile updated successfully");
-            }
+            console.log(body);
+        //     if(data.success){
+        //         const updatedUser = {
+        //   ...data.user,
+        //   profilePic: data.user.profilePic
+        //     ? `${data.user.profilePic}?v=${Date.now()}`
+        //     : null,};
+
+        //         setAuthUser(updatedUser);
+        //         localStorage.setItem("chat-user", JSON.stringify(updatedUser));
+        //         toast.success("Profile updated successfully");
+        //     }
+
+        console.log(data)
         }catch(error){
             toast.error(error.message);
         }

@@ -10,20 +10,31 @@ const RightSidebar = () => {
   const {selectedUser,messages} = useContext(ChatContext)
   const {logout,onlineUsers} = useContext(AuthContext)
   const [msgImages,setMsgImages] = useState([])
+  const [userData , setUserData] = useState([]);
+const id = localStorage.getItem("userId")
+    const getuserProfile = async()=>{
+      const res = await axios.get("http://localhost:5000/api/auth/get-userprofile/"+id);
+      // console.log("hi ",res.data);
+      // setImgUrl(res.data.data.profilePicture);
+      setUserData(res.data.data)
+    }
 
+    console.log(userData);
   //Get all the images from the messages and set them to state
 
   useEffect(()=>{
     setMsgImages(
       messages.filter(msg => msg.image).map(msg=>msg.image)
     )
+
+    getuserProfile();
   },[messages])
 
   return selectedUser && (
     <div className={`bg-[#8185B2]/10 text-white w-full relative overflow-y-scroll ${selectedUser ? "max-md:hidden":""}`}>
 
       <div className='pt-16 flex flex-col items-center gap-2 text-xs font-light mx-auto'> 
-        <img src={selectedUser?.profilePic || "/default-avatar.png"} alt ="" className='w-20 aspect-[1/1] rounded-full'/>
+        <img src={selectedUser?.profilePicture} alt ="" className='w-20 aspect-[1/1] rounded-full'/>
         <h1 className='px-10 text-xl font-medium mx-auto flex items-center gap-2'>
           {onlineUsers.includes(selectedUser._id) && <p className='w-2 h-2 rounded-full bg-green-500'></p>}
           {selectedUser.fullName}

@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../lib/utils.js";
 import cloudinary from "../lib/cloudinary.js";
+import { json } from "express";
 
 //signup a new user
 export const signup = async (req,res)=>{
@@ -63,23 +64,30 @@ export const checkAuth = (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
     const { profilePic, bio, fullName } = req.body;
+    console.log(req.body);
     const userId = req.user._id;
-    let updatedUser;
 
-    if (!profilePic) {
-        updatedUser = await User.findByIdAndUpdate(
-            userId,
-            {bio, fullName},
-            { new: true }
-        );
-    }else{
-        const upload = await cloudinary.uploader.upload(profilePic)
+    // if (!profilePic) {
+    //     updatedUser = await User.findByIdAndUpdate(
+    //         userId,
+    //         {bio, fullName, profilePic},
+    //         { new: true }
+    //     );}
+    // }else{
+    //     const upload = await cloudinary.uploader.upload(profilePic)
         
-        updatedUser = await User.findByIdAndUpdate(userId,{profilePic:upload.secure_url, bio, fullName},
-            { new: true });
-            console.log("profile pic updated");
-    } 
+    //     updatedUser = await User.findByIdAndUpdate(userId,{profilePic:upload.secure_url, bio, fullName},
+    //         { new: true });
+    //         console.log("profile pic updated");
+    // } 
+
+    const updatedUser = await User.findByIdAndUpdate(userId,{
+        bio:bio,
+        fullName:fullName,
+        profilePicture:profilePic
+    }) 
     res.json({ success: true, user: updatedUser});
+    // console.log(updatedUser);
     }
     
     catch (error) {
@@ -94,6 +102,17 @@ export const getProfile = async(req,res) =>{
         res.json({message:"User Successfully fetched ", data : user})
     }catch(error){
         res.json({message:"Error", error})
+        console.log(error);
+    }
+}
+
+export const getUserProfile = async(req,res)=>{
+    try {
+        const {id} = req.params;
+        const user = await User.findById(id);
+        res.json({message:"User fetched sucessfully", data:user})
+    } catch (error) {
+        res.json(error);
         console.log(error);
     }
 }

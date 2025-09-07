@@ -10,6 +10,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [name, setName] = useState(authUser.fullName);
   const [bio, setBio] = useState(authUser.bio);
+  const [imgUrl, setImgUrl] = useState(null);
 
   // const handleSubmit = async (e) =>{
   //   e.preventDefault();
@@ -38,6 +39,8 @@ const ProfilePage = () => {
     profilePicUrl = await handleImageUpload(selectedImg);
   }
 
+  console.log("profile",profilePicUrl)
+
   // ✅ Save updated profile info
   await updateProfile({
     fullName: name,
@@ -64,6 +67,8 @@ const handleImageUpload = async (file) => {
     const result = await res.json();
     console.log("Uploaded URL:", result.secure_url);
     return result.secure_url;
+    setImgUrl(result.secure_url)
+
   } catch (err) {
     console.error("Upload error:", err);
   }
@@ -103,10 +108,10 @@ const handleImageUpload = async (file) => {
               src={
                 selectedImg
                   ? URL.createObjectURL(selectedImg)
-                  : authUser?.profilePic || assets.avatar_icon
+                  : authUser?.profilePicture || assets.avatar_icon
               }
               alt=""
-              className={`w-12 h-12 ${selectedImg && 'rounded-full'}`}
+              className={`w-12 h-12 rounded-full ${selectedImg && 'rounded-full'}`}
             />
             Upload Profile Image
           </label>
@@ -140,7 +145,7 @@ const handleImageUpload = async (file) => {
           src={
              selectedImg
              ? URL.createObjectURL(selectedImg)
-            :authUser?.profilePic || assets.logo_icon}
+            :authUser?.profilePicture || assets.logo_icon}
           alt=""
         />
       </div>
