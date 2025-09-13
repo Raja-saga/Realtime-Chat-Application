@@ -2,6 +2,7 @@ import React, { useContext, useEffect,useState } from 'react'
 import { imagesDummyData } from '../assets/assets'
 import { ChatContext } from '../context/ChatContext'
 import { AuthContext } from '../context/AuthContext'
+import axios from 'axios'
 //import { imagesDummyData } from '../src/assets'
 
 
