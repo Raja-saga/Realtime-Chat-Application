@@ -13,7 +13,7 @@ const RightSidebar = () => {
   const [userData , setUserData] = useState([]);
 const id = localStorage.getItem("userId")
     const getuserProfile = async()=>{
-      const res = await axios.get("http://localhost:5000/api/auth/get-userprofile/"+id);
+      const res = await axios.get(" https://realtime-chat-application-pcv2.onrender.com/api/auth/get-userprofile/"+id);
       // console.log("hi ",res.data);
       // setImgUrl(res.data.data.profilePicture);
       setUserData(res.data.data)

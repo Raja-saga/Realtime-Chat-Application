@@ -22,7 +22,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const getuserProfile = async()=>{
-    const res = await axios.get("http://localhost:5000/api/auth/get-profile");
+    const res = await axios.get("https://realtime-chat-application-pcv2.onrender.com/api/auth/get-profile");
     console.log("hi ",res.data);
     // setImgUrl(res.data.data.profilePicture);
     setImgUrl(res.data.data)
